@@ -55,6 +55,7 @@ final class ChatPipeline {
             if (useSpeech) {
                 try {
                     byte[] got = OnlineServices.speak(line);
+                    LOG.info("Speech audio received: {} bytes", got.length);
                     if (got.length >= 2 && got.length <= MAX_PCM_BYTES) pcm = got;
                     else LOG.warn("Speech audio was {} bytes, skipping audio", got.length);
                 } catch (Exception e) {
@@ -98,7 +99,10 @@ final class ChatPipeline {
             boolean hears = pcm.length > 0 && d2 <= (double) audioRange * audioRange;
             boolean sees = bubble && d2 <= (double) bubbleRange * bubbleRange;
             if (!hears && !sees) continue;
-            if (!p.connection.hasChannel(VoiceLinePayload.TYPE)) continue;
+            if (!p.connection.hasChannel(VoiceLinePayload.TYPE)) {
+                LOG.warn("Not sending a voice line to {}: their game does not have Victorian Voice", p.getName().getString());
+                continue;
+            }
             PacketDistributor.sendToPlayer(p, hears ? withAudio : silent);
         }
     }

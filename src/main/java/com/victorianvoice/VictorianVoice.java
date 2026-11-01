@@ -6,6 +6,7 @@ import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.event.ServerChatEvent;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
@@ -18,6 +19,7 @@ public final class VictorianVoice {
         container.registerConfig(ModConfig.Type.COMMON, VoiceConfig.SPEC);
         modBus.addListener(this::registerPayloads);
         NeoForge.EVENT_BUS.addListener(this::onServerChat);
+        NeoForge.EVENT_BUS.addListener(this::onCommands);
     }
 
     private void registerPayloads(RegisterPayloadHandlersEvent event) {
@@ -25,6 +27,10 @@ public final class VictorianVoice {
         // The lambda body only touches ClientAudio when it runs, so dedicated servers never load it.
         registrar.playToClient(VoiceLinePayload.TYPE, VoiceLinePayload.CODEC,
             (payload, context) -> ClientAudio.onLine(payload));
+    }
+
+    private void onCommands(RegisterCommandsEvent event) {
+        VoiceCommands.register(event);
     }
 
     private void onServerChat(ServerChatEvent event) {
