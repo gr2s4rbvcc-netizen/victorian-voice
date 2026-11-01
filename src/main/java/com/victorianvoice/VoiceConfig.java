@@ -1,6 +1,6 @@
 package com.victorianvoice;
 
-import java.util.List;
+import java.util.Arrays;
 import net.neoforged.neoforge.common.ModConfigSpec;
 
 /** Server-side settings, written to config/victorian_voice-common.toml on first launch. */
@@ -33,8 +33,9 @@ public final class VoiceConfig {
         B.push("translation");
         ENABLED = B.comment("Rewrite player chat in Victorian English on the server.")
             .define("enabled", true);
+        // Arrays.asList, not List.of: an immutable list throws when the config system tests a null value.
         PROVIDER = B.comment("local = built-in rules (free, no key). anthropic = Claude API. openai = OpenAI-compatible chat API.")
-            .defineInList("provider", "local", List.of("local", "anthropic", "openai"));
+            .defineInList("provider", "local", Arrays.asList("local", "anthropic", "openai"));
         ANTHROPIC_KEY = B.comment("Anthropic API key. If blank, the ANTHROPIC_API_KEY environment variable is used.")
             .define("anthropicApiKey", "");
         ANTHROPIC_MODEL = B.comment("Model used when provider = anthropic.")
