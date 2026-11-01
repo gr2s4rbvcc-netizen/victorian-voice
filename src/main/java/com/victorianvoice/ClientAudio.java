@@ -23,7 +23,12 @@ final class ClientAudio {
 
     private ClientAudio() {}
 
-    static void play(VoiceLinePayload payload) {
+    /** Called on the main thread for every received line. */
+    static void onLine(VoiceLinePayload payload) {
+        if (payload.pcm().length < 2) {
+            ClientBubbles.show(payload);
+            return;
+        }
         AUDIO.execute(() -> {
             try {
                 playBlocking(payload);
@@ -34,7 +39,10 @@ final class ClientAudio {
     }
 
     private static void playBlocking(VoiceLinePayload p) throws InterruptedException {
-        if (ALC10.alcGetCurrentContext() == 0L || p.pcm().length < 2) return;
+        if (ALC10.alcGetCurrentContext() == 0L) {
+            ClientBubbles.show(p);
+            return;
+        }
         int buffer = AL10.alGenBuffers();
         int source = AL10.alGenSources();
         ByteBuffer data = MemoryUtil.memAlloc(p.pcm().length);
@@ -50,6 +58,8 @@ final class ClientAudio {
         AL10.alSource3f(source, AL10.AL_POSITION, (float) p.x(), (float) p.y(), (float) p.z());
         AL10.alSourcef(source, AL10.AL_GAIN, gain(p));
         AL10.alSourcePlay(source);
+        // Start the bubble at the same moment the audio starts so the typing matches the voice.
+        ClientBubbles.show(p);
 
         long seconds = p.pcm().length / 2L / Math.max(1, p.sampleRate());
         long deadline = System.currentTimeMillis() + (seconds + 3L) * 1000L;

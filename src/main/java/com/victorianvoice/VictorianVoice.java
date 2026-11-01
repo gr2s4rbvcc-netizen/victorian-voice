@@ -24,7 +24,7 @@ public final class VictorianVoice {
         PayloadRegistrar registrar = event.registrar("1").optional();
         // The lambda body only touches ClientAudio when it runs, so dedicated servers never load it.
         registrar.playToClient(VoiceLinePayload.TYPE, VoiceLinePayload.CODEC,
-            (payload, context) -> ClientAudio.play(payload));
+            (payload, context) -> ClientAudio.onLine(payload));
     }
 
     private void onServerChat(ServerChatEvent event) {

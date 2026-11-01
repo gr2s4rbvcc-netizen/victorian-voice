@@ -27,6 +27,11 @@ public final class VoiceConfig {
     public static final ModConfigSpec.DoubleValue TTS_VOLUME;
     public static final ModConfigSpec.IntValue TTS_SAMPLE_RATE;
 
+    public static final ModConfigSpec.BooleanValue BUBBLE_ENABLED;
+    public static final ModConfigSpec.IntValue BUBBLE_CPS;
+    public static final ModConfigSpec.IntValue BUBBLE_HOLD_MS;
+    public static final ModConfigSpec.IntValue BUBBLE_RANGE;
+
     public static final ModConfigSpec SPEC;
 
     static {
@@ -68,6 +73,17 @@ public final class VoiceConfig {
         TTS_VOLUME = B.defineInRange("volume", 1.0D, 0.0D, 2.0D);
         TTS_SAMPLE_RATE = B.comment("Sample rate of the raw PCM audio the speech API returns. OpenAI uses 24000.")
             .defineInRange("sampleRate", 24000, 8000, 48000);
+        B.pop();
+
+        B.push("bubble");
+        BUBBLE_ENABLED = B.comment("Show an animated speech bubble above the speaker. Needs the mod on the viewer's side.")
+            .define("enabled", true);
+        BUBBLE_CPS = B.comment("Typing speed in characters per second when there is no speech audio. With speech, the typing matches the audio length instead.")
+            .defineInRange("charsPerSecond", 22, 5, 80);
+        BUBBLE_HOLD_MS = B.comment("How long the bubble stays after the last letter appears.")
+            .defineInRange("holdMillis", 3500, 500, 20000);
+        BUBBLE_RANGE = B.comment("How many blocks away the bubble can be seen.")
+            .defineInRange("rangeBlocks", 48, 8, 128);
         B.pop();
 
         SPEC = B.build();
